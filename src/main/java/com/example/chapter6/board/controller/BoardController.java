@@ -38,10 +38,10 @@ public class BoardController {
             Model model
     ) {
 
-        List<BoardVO> result = boardService.selectBoardVO(searchHelper);
+        HashMap<String, Object> result = boardService.selectBoardVO(searchHelper);
 
-        model.addAttribute("searchHelper", searchHelper);
-        model.addAttribute("result", result);
+        model.addAttribute("searchHelper", result.get("searchHelper"));
+        model.addAttribute("result", result.get("list"));
 
         return "board/list";
     }

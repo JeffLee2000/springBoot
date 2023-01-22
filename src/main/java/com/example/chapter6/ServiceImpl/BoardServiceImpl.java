@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -26,8 +27,28 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     @Override
-    public List<BoardVO> selectBoardVO(SearchHelper searchHelper) {
-        return boardMapper.selectBoardVO(searchHelper);
+    public HashMap<String, Object> selectBoardVO(SearchHelper searchHelper) {
+
+        HashMap<String, Object> resultMap = new HashMap<>();
+
+        int totalCnt = boardMapper.countBoardVO(searchHelper);
+
+        int code = searchHelper.getSrchCode();
+        String srchType = searchHelper.getSrchType();
+        String srchKeyword = searchHelper.getSrchKeyword();
+
+        searchHelper = new SearchHelper(totalCnt, searchHelper.getPage());
+
+        searchHelper.setSrchCode(code);
+        searchHelper.setSrchType(srchType);
+        searchHelper.setSrchKeyword(srchKeyword);
+
+        List<BoardVO> list = boardMapper.selectBoardVO(searchHelper);
+
+        resultMap.put("list", list);
+        resultMap.put("searchHelper", searchHelper);
+
+        return resultMap;
     }
 
     /**

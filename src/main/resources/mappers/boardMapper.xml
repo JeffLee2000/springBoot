@@ -8,11 +8,11 @@
     <!-- 게시물 목록 -->
     <select id="selectBoardVO" parameterType="SearchHelper" resultType="BoardVO">
         SELECT
-        id,
-        title,
-        count,
-        reg_id,
-        reg_date
+            id,
+            title,
+            count,
+            reg_id,
+            reg_date
         FROM board
         <where>
             <if test="srchType == 'title'">
@@ -26,6 +26,25 @@
             </if>
         </where>
         ORDER BY id DESC
+        LIMIT #{startIndex}, #{pageSize}
+    </select>
+
+    <!-- 게시물 목록 카운트 -->
+    <select id="countBoardVO" parameterType="SearchHelper" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM board
+        <where>
+            <if test="srchType == 'title'">
+                AND title LIKE CONCAT('%', #{srchKeyword}, '%')
+            </if>
+            <if test="srchType == 'content'">
+                AND content LIKE CONCAT('%', #{srchKeyword}, '%')
+            </if>
+            <if test="srchCode">
+                AND code = #{srchCode}
+            </if>
+        </where>
     </select>
 
     <!-- 게시물 선택 -->

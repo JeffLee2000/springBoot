@@ -3,11 +3,12 @@ package com.example.chapter6.service;
 import com.example.chapter6.model.BoardVO;
 import com.example.chapter6.model.SearchHelper;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface BoardService {
 
-    List<BoardVO> selectBoardVO(SearchHelper searchHelper);
+    HashMap<String, Object> selectBoardVO(SearchHelper searchHelper);
 
     BoardVO selectBoardVOById(int id);
 
