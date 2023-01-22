@@ -47,27 +47,34 @@ public class BoardController {
     }
 
     @RequestMapping("/write")
-    public String boardWrite(Model model) {
+    public String boardWrite(
+            Model model,
+            @ModelAttribute SearchHelper searchHelper
+    ) {
         BoardVO boardVO = new BoardVO();
         boardVO.setCode(1000);
         model.addAttribute("boardVO", boardVO);
+        model.addAttribute("searchHelper", searchHelper);
         return "board/write";
     }
 
     @RequestMapping("/modify")
     public String boardModify(
             @RequestParam(value = "id", defaultValue = "0") int id,
+            @ModelAttribute SearchHelper searchHelper,
             Model model
     ) {
         if(id > 0) {
             // 게시물 조회
             BoardVO boardVO = boardService.selectBoardVOById(id);
             model.addAttribute("boardVO", boardVO);
+            model.addAttribute("searchHelper", searchHelper);
         } else {
             Message message = new Message();
             message.setMessage("게시물이 없습니다.");
-            message.setHref("/board/list");
+            message.setHref("/board/list?srchCode=" + searchHelper.getSrchCode() + "&srchType=" + searchHelper.getSrchType() + "&srchKeyword=" + searchHelper.getSrchKeyword());
             model.addAttribute("data", message);
+            model.addAttribute("searchHelper", searchHelper);
         }
 
         return "board/write";
@@ -76,6 +83,7 @@ public class BoardController {
     @RequestMapping("/view")
     public String boardView(
             @RequestParam(value = "id", defaultValue = "0") int id,
+            @ModelAttribute SearchHelper searchHelper,
             Model model
     ) {
 
@@ -83,11 +91,13 @@ public class BoardController {
             // 게시물 조회
             BoardVO boardVO = boardService.selectBoardVOById(id);
             model.addAttribute("boardVO", boardVO);
+            model.addAttribute("searchHelper", searchHelper);
         } else {
             Message message = new Message();
             message.setMessage("게시물이 없습니다.");
             message.setHref("/board/list");
             model.addAttribute("data", message);
+            model.addAttribute("searchHelper", searchHelper);
         }
 
         return "board/view";
@@ -96,6 +106,7 @@ public class BoardController {
     @PostMapping("/save")
     public String boardSave(
             @ModelAttribute BoardVO boardVO,
+            @ModelAttribute SearchHelper searchHelper,
             HttpServletRequest request,
             Model model
     ) {
