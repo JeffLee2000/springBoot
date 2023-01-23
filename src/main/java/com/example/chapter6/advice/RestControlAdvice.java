@@ -1,6 +1,7 @@
 package com.example.chapter6.advice;
 
 import com.example.chapter6.exception.BadRequestException;
+import com.example.chapter6.exception.InsertFailException;
 import com.example.chapter6.payload.response.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,4 +20,12 @@ public class RestControlAdvice {
     public ApiResponse handleBadRequestException(BadRequestException ex) {
         return new ApiResponse(false, ex.getMessage(), ex.getClass().getName());
     }
+
+    @ExceptionHandler(value = InsertFailException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ApiResponse handleBadRequestException(InsertFailException ex) {
+        return new ApiResponse(false, ex.getMessage(), ex.getClass().getName());
+    }
+
+
 }

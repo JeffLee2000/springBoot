@@ -8,10 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -59,8 +61,7 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     @Override
-    public BoardVO selectBoardVOById(int id) throws Exception {
-
+    public Optional<BoardVO> selectBoardVOById(int id) throws Exception {
         boardMapper.updateCount(id);
         return boardMapper.selectBoardVOById(id);
     }
@@ -92,4 +93,14 @@ public class BoardServiceImpl implements BoardService {
         boardMapper.insertBoardVO(boardVO);
     }
 
+    public Map<String, String> formValidation(Errors errors) {
+        Map<String, String> result = new HashMap<>();
+
+        for (FieldError error : errors.getFieldErrors()) {
+            String validKeyName = String.format("valid_%s", error.getField());
+            result.put(validKeyName, error.getDefaultMessage());
+        }
+
+        return result;
+    }
 }

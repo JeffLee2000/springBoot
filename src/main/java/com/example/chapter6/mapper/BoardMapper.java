@@ -5,6 +5,7 @@ import com.example.chapter6.model.SearchHelper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface BoardMapper {
@@ -13,7 +14,7 @@ public interface BoardMapper {
 
     int countBoardVO(SearchHelper searchHelper) throws Exception;
 
-    BoardVO selectBoardVOById(int id) throws Exception;
+    Optional<BoardVO> selectBoardVOById(int id) throws Exception;
 
     void updateBoardVO(BoardVO boardVO) throws Exception;
 

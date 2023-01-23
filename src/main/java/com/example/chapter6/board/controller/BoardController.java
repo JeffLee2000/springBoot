@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/board")
@@ -68,7 +69,7 @@ public class BoardController {
     ) throws Exception {
         if(id > 0) {
             // 게시물 조회
-            BoardVO boardVO = boardService.selectBoardVOById(id);
+            Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
             model.addAttribute("boardVO", boardVO);
             model.addAttribute("searchHelper", searchHelper);
         } else {
@@ -91,7 +92,7 @@ public class BoardController {
 
         if(id > 0) {
             // 게시물 조회
-            BoardVO boardVO = boardService.selectBoardVOById(id);
+            Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
             model.addAttribute("boardVO", boardVO);
             model.addAttribute("searchHelper", searchHelper);
         } else {

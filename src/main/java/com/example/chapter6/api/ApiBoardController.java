@@ -1,6 +1,8 @@
 package com.example.chapter6.api;
 
+import com.example.chapter6.Util.ExceptionMessage;
 import com.example.chapter6.exception.BadRequestException;
+import com.example.chapter6.exception.InsertFailException;
 import com.example.chapter6.model.BoardVO;
 import com.example.chapter6.model.SearchHelper;
 import com.example.chapter6.payload.response.ApiResponse;
@@ -10,9 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/board")
@@ -42,6 +48,7 @@ public class ApiBoardController {
     public ResponseEntity boardList(
             @RequestBody SearchHelper searchHelper
             ) throws Exception {
+
         HashMap<String, Object> result = boardService.selectBoardVO(searchHelper);
 
         return new ResponseEntity(result, HttpStatus.OK);
@@ -56,8 +63,12 @@ public class ApiBoardController {
     public  ResponseEntity boardView(
             @PathVariable int id
     ) throws Exception {
-        BoardVO boardVO = boardService.selectBoardVOById(id);
-        return new ResponseEntity(boardVO, HttpStatus.OK);
+        Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
+        if (boardVO.isPresent()) {
+            return new ResponseEntity(boardVO, HttpStatus.OK);
+        } else {
+            throw new BadRequestException(ExceptionMessage.ARTICLE_NOT_FOUND);
+        }
     }
 
     /**
@@ -66,29 +77,73 @@ public class ApiBoardController {
      * @return
      */
     @PostMapping("/save")
-    public ResponseEntity boardSave(
-            @RequestBody BoardVO boardVO
+    public ApiResponse boardSave(
+            @RequestBody @Valid BoardVO boardVO, Errors errors
     ) throws Exception {
+
+        HashMap<String, Object> errorMap = new HashMap<>();
+
+        if (errors.hasErrors()) {
+            Map<String, String> validate = boardService.formValidation(errors);
+
+            for (String key : validate.keySet()) {
+                errorMap.put(key, validate.get(key));
+            }
+
+            return new ApiResponse(false, ExceptionMessage.SAVE_FAIL, errorMap);
+        }
+
         boardVO.setRegId("api");
-        boardService.insertBoardVO(boardVO);
-        return new ResponseEntity("OK", HttpStatus.OK);
+        try {
+            boardService.insertBoardVO(boardVO);
+        } catch (Exception e) {
+            throw new InsertFailException(ExceptionMessage.SAVE_FAIL);
+        }
+        return new ApiResponse(true, ExceptionMessage.SAVE_SUCCESS);
     }
 
+    /**
+     * 게시물 수정
+     * @param boardVO
+     * @return
+     * @throws Exception
+     */
     @PutMapping("/update")
-    public ResponseEntity boardUpdate(
+    public ApiResponse boardUpdate(
             @RequestBody BoardVO boardVO
     ) throws Exception {
         boardVO.setRegId("api");
-        boardService.updateBoardVO(boardVO);
-        return new ResponseEntity("OK", HttpStatus.OK);
+        try {
+            boardService.updateBoardVO(boardVO);
+        } catch (Exception e) {
+            throw new InsertFailException(ExceptionMessage.SAVE_FAIL);
+        }
+        return new ApiResponse(true, ExceptionMessage.SAVE_SUCCESS);
     }
 
+    /**
+     * 게시물 삭제
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity boardDelete(
+    public ApiResponse boardDelete(
             @PathVariable int id
     ) throws Exception {
-        boardService.deleteById(id);
-        return new ResponseEntity("OK", HttpStatus.OK);
+
+        Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
+
+        if (boardVO.isPresent()) {
+            try {
+                boardService.deleteById(id);
+            } catch (Exception e) {
+                throw new InsertFailException(ExceptionMessage.DELETE_FAIL);
+            }
+        } else {
+            throw new InsertFailException(ExceptionMessage.NOT_FOUND_ARTICLE);
+        }
+        return new ApiResponse(true, ExceptionMessage.DELETE_SUCCESS);
     }
 
 }
