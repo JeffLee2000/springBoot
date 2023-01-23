@@ -40,6 +40,8 @@ public class BoardController {
 
         HashMap<String, Object> result = boardService.selectBoardVO(searchHelper);
 
+        logger.info(searchHelper.toString());
+
         model.addAttribute("searchHelper", result.get("searchHelper"));
         model.addAttribute("result", result.get("list"));
 
@@ -98,6 +100,7 @@ public class BoardController {
             message.setHref("/board/list");
             model.addAttribute("data", message);
             model.addAttribute("searchHelper", searchHelper);
+            return "message/message";
         }
 
         return "board/view";

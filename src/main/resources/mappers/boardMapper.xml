@@ -50,14 +50,14 @@
     <!-- 게시물 선택 -->
     <select id="selectBoardVOById" parameterType="int" resultType="BoardVO">
         SELECT
-        id,
-        code,
-        title,
-        content,
-        count,
-        reg_id,
-        reg_date,
-        mod_date
+            id,
+            code,
+            title,
+            content,
+            count,
+            reg_id,
+            reg_date,
+            mod_date
         FROM board
         WHERE id = #{id}
     </select>
@@ -65,33 +65,33 @@
     <!-- 게시물 저장 -->
     <insert id="insertBoardVO" parameterType="BoardVO">
         INSERT INTO board (
-        code,
-        title,
-        content,
-        reg_id,
-        reg_date
+            code,
+            title,
+            content,
+            reg_id,
+            reg_date
         ) VALUES (
-        #{code},
-        #{title},
-        #{content},
-        #{regId},
-        NOW()
+            #{code},
+            #{title},
+            #{content},
+            #{regId},
+            NOW()
         )
     </insert>
 
     <!-- 게시물 수정 -->
     <update id="updateBoardVO" parameterType="BoardVO">
         UPDATE board SET
-        title = #{title},
-        content = #{content},
-        mod_date = NOW()
+            title = #{title},
+            content = #{content},
+            mod_date = NOW()
         WHERE id = #{id}
     </update>
 
     <!-- 조회수 증가 -->
     <update id="updateCount" parameterType="int">
         UPDATE board SET
-        count = count + 1
+            count = count + 1
         WHERE id = #{id}
     </update>
 
