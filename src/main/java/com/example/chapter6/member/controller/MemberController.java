@@ -89,7 +89,7 @@ public class MemberController {
             @RequestParam(value = "userId", defaultValue = "") String userId,
             @RequestParam(value = "password", defaultValue = "") String password,
             HttpServletRequest request
-    ) {
+    ) throws Exception {
         if (!userId.equals("") && !password.equals("")) {
             MemberVO memberVO = new MemberVO();
             memberVO.setUserId(userId);
@@ -123,7 +123,7 @@ public class MemberController {
             @RequestParam(value = "name", defaultValue = "") String name,
             @RequestParam(value = "email", defaultValue = "") String email,
             ModelAndView mav
-    ) throws IOException {
+    ) throws Exception {
 
         if (!name.equals("") && !email.equals("")) {
             MemberVO memberVO = new MemberVO();
@@ -182,7 +182,7 @@ public class MemberController {
             @RequestParam(value = "email", defaultValue = "") String email,
             @RequestParam(value = "userId", defaultValue = "") String userId,
             ModelAndView mav
-    ) {
+    ) throws Exception {
         if (!name.equals("") && !email.equals("") && !userId.equals("")) {
             MemberVO memberVO = new MemberVO();
             memberVO.setName(name);

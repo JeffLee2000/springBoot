@@ -8,19 +8,19 @@ import java.util.Map;
 
 public interface MemberService {
 
-    Boolean duplicateId(String id);
+    Boolean duplicateId(String id) throws Exception;
 
-    Boolean duplicateEmail(String email);
+    Boolean duplicateEmail(String email) throws Exception;
 
     void insertMember(MemberVO memberVO) throws Exception;
 
-    Boolean loginProcess(MemberVO memberVO, HttpServletRequest request);
+    Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) throws Exception;
 
-    String findUserId(MemberVO memberVO);
+    String findUserId(MemberVO memberVO) throws Exception;
 
-    String findPassword(MemberVO memberVO);
+    String findPassword(MemberVO memberVO) throws Exception;
 
-    void updatePassword(MemberVO memberVO);
+    void updatePassword(MemberVO memberVO) throws Exception;
 
     Map<String, String> formValidation(Errors errors);
 

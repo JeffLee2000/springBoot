@@ -7,9 +7,11 @@ import com.example.chapter6.service.BoardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -27,7 +29,7 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     @Override
-    public HashMap<String, Object> selectBoardVO(SearchHelper searchHelper) {
+    public HashMap<String, Object> selectBoardVO(SearchHelper searchHelper) throws Exception {
 
         HashMap<String, Object> resultMap = new HashMap<>();
 
@@ -57,7 +59,7 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     @Override
-    public BoardVO selectBoardVOById(int id) {
+    public BoardVO selectBoardVOById(int id) throws Exception {
 
         boardMapper.updateCount(id);
         return boardMapper.selectBoardVOById(id);
@@ -68,7 +70,7 @@ public class BoardServiceImpl implements BoardService {
      * @param boardVO
      */
     @Override
-    public void updateBoardVO(BoardVO boardVO) {
+    public void updateBoardVO(BoardVO boardVO) throws Exception {
         boardMapper.updateBoardVO(boardVO);
     }
 
@@ -77,7 +79,7 @@ public class BoardServiceImpl implements BoardService {
      * @param id
      */
     @Override
-    public void deleteById(int id) {
+    public void deleteById(int id) throws Exception {
         boardMapper.deleteById(id);
     }
 
@@ -86,7 +88,8 @@ public class BoardServiceImpl implements BoardService {
      * @param boardVO
      */
     @Override
-    public void insertBoardVO(BoardVO boardVO) {
+    public void insertBoardVO(BoardVO boardVO) throws Exception {
         boardMapper.insertBoardVO(boardVO);
     }
+
 }

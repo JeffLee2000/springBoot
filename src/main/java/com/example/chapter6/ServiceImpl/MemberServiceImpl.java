@@ -28,7 +28,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean duplicateId(String id) {
+    public Boolean duplicateId(String id) throws Exception {
         Boolean res = memberMapper.duplicateId(id);
         return res ? true : false;
     }
@@ -39,7 +39,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean duplicateEmail(String email) {
+    public Boolean duplicateEmail(String email) throws Exception {
         Boolean res = memberMapper.duplicateEmail(email);
         return res ? true : false;
     }
@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) {
+    public Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) throws Exception {
         MemberVO result = memberMapper.loginProcess(memberVO);
 
         if (result != null) {
@@ -79,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public String findUserId(MemberVO memberVO) {
+    public String findUserId(MemberVO memberVO) throws Exception {
         return memberMapper.findUserId(memberVO);
     }
 
@@ -89,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public String findPassword(MemberVO memberVO) {
+    public String findPassword(MemberVO memberVO) throws Exception {
         return memberMapper.findPassword(memberVO);
     }
 
@@ -98,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
      * @param memberVO
      */
     @Override
-    public void updatePassword(MemberVO memberVO) {
+    public void updatePassword(MemberVO memberVO) throws Exception {
         memberMapper.updatePassword(memberVO);
     }
 

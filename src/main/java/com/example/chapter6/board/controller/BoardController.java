@@ -36,7 +36,7 @@ public class BoardController {
     public String boardList(
             @ModelAttribute SearchHelper searchHelper,
             Model model
-    ) {
+    ) throws Exception {
 
         HashMap<String, Object> result = boardService.selectBoardVO(searchHelper);
 
@@ -65,7 +65,7 @@ public class BoardController {
             @RequestParam(value = "id", defaultValue = "0") int id,
             @ModelAttribute SearchHelper searchHelper,
             Model model
-    ) {
+    ) throws Exception {
         if(id > 0) {
             // 게시물 조회
             BoardVO boardVO = boardService.selectBoardVOById(id);
@@ -87,7 +87,7 @@ public class BoardController {
             @RequestParam(value = "id", defaultValue = "0") int id,
             @ModelAttribute SearchHelper searchHelper,
             Model model
-    ) {
+    ) throws Exception {
 
         if(id > 0) {
             // 게시물 조회
@@ -112,7 +112,7 @@ public class BoardController {
             @ModelAttribute SearchHelper searchHelper,
             HttpServletRequest request,
             Model model
-    ) {
+    ) throws Exception {
 
         HttpSession session = request.getSession();
         MemberVO sessionResult = (MemberVO) session.getAttribute("memberVO");
@@ -151,7 +151,7 @@ public class BoardController {
     public String delete(
             @RequestParam(value = "del[]", defaultValue = "") int[] del,
             Model model
-    ) {
+    ) throws Exception {
 
         logger.info("삭제배열 -{}", del);
 

@@ -9,18 +9,18 @@ import java.util.List;
 @Mapper
 public interface BoardMapper {
 
-    List<BoardVO> selectBoardVO(SearchHelper searchHelper);
+    List<BoardVO> selectBoardVO(SearchHelper searchHelper) throws Exception;
 
-    int countBoardVO(SearchHelper searchHelper);
+    int countBoardVO(SearchHelper searchHelper) throws Exception;
 
-    BoardVO selectBoardVOById(int id);
+    BoardVO selectBoardVOById(int id) throws Exception;
 
-    void updateBoardVO(BoardVO boardVO);
+    void updateBoardVO(BoardVO boardVO) throws Exception;
 
-    void updateCount(int id);
+    void updateCount(int id) throws Exception;
 
-    void deleteById(int id);
+    void deleteById(int id) throws Exception;
 
-    void insertBoardVO(BoardVO boardVO);
+    void insertBoardVO(BoardVO boardVO) throws Exception;
 
 }
