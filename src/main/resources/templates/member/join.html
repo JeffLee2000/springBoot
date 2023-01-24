@@ -53,6 +53,42 @@
                 </ul>
             </nav>
         </form>
+<script>
+let idCheck = false;
+let emailCheck = false;
+$('#idDup').click(function(){
+    const userId = $('#userId').val();
+    $.get('http://localhost:8080/api/member/exist/id/' + userId, function(res){
+        if (res.success) {
+            alert(res.data);
+            idCheck = true;
+        } else {
+            alert(res.data);
+            idCheck = false;
+        }
+    });
+});
+$('#emailDup').click(function(){
+    const email = $('#email').val();
+    $.get('http://localhost:8080/api/member/exist/email/' + email, function(res){
+        if (res.success) {
+            alert(res.data);
+            emailCheck = true;
+        } else {
+            alert(res.data);
+            emailCheck = false;
+        }
+    });
+});
+$('#frm').submit(function(e){
+    e.preventDefault();
+    if (idCheck && emailCheck) {
+        this.submit();
+    } else {
+        alert('아이디 또는 이메일 중복을 확인하세요.);
+    }
+}
+</script>
     </div>
 </section>
 </body>

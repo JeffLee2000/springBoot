@@ -2,7 +2,10 @@ package com.example.chapter6.advice;
 
 import com.example.chapter6.exception.BadRequestException;
 import com.example.chapter6.exception.InsertFailException;
+import com.example.chapter6.exception.ResourceAlreadyUseException;
+import com.example.chapter6.exception.UserNotFoundException;
 import com.example.chapter6.payload.response.ApiResponse;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,5 +30,16 @@ public class RestControlAdvice {
         return new ApiResponse(false, ex.getMessage(), ex.getClass().getName());
     }
 
+    @ExceptionHandler(value = ResourceAlreadyUseException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiResponse handleResourceAlreadyInUseException(ResourceAlreadyUseException ex) {
+        return new ApiResponse(false, ex.getMessage(), ex.getClass().getName());
+    }
+
+    @ExceptionHandler(value = UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse handleUserNotFoundException(UserNotFoundException ex) {
+        return new ApiResponse(false, ex.getMessage(), ex.getClass().getName());
+    }
 
 }
