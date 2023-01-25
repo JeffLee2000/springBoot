@@ -63,7 +63,7 @@
     </select>
 
     <!-- 게시물 저장 -->
-    <insert id="insertBoardVO" parameterType="BoardVO">
+    <insert id="insertBoardVO" parameterType="BoardVO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO board (
             code,
             title,

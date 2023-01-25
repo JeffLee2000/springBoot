@@ -1,5 +1,7 @@
 package com.example.chapter6.board.controller;
 
+import com.example.chapter6.file.FileMapService;
+import com.example.chapter6.file.UploadFileService;
 import com.example.chapter6.model.BoardVO;
 import com.example.chapter6.model.MemberVO;
 import com.example.chapter6.model.Message;
@@ -42,9 +44,13 @@ public class BoardController {
     private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
     private BoardService boardService;
+    private UploadFileService uploadFileService;
+    private FileMapService fileMapService;
 
-    public BoardController(BoardService boardService) {
+    public BoardController(BoardService boardService, UploadFileService uploadFileService, FileMapService fileMapService) {
         this.boardService = boardService;
+        this.uploadFileService = uploadFileService;
+        this.fileMapService = fileMapService;
     }
 
     @RequestMapping("/list")
@@ -124,11 +130,10 @@ public class BoardController {
     @PostMapping("/save")
     public String boardSave(
             @ModelAttribute BoardVO boardVO,
-            @ModelAttribute SearchHelper searchHelper,
+            @RequestParam("file") List<MultipartFile> multipartFile,
             HttpServletRequest request,
             Model model
     ) throws Exception {
-
         HttpSession session = request.getSession();
         MemberVO sessionResult = (MemberVO) session.getAttribute("memberVO");
 
@@ -146,6 +151,10 @@ public class BoardController {
             } else {
                 // 저장
                 boardService.insertBoardVO(boardVO);
+            }
+
+            for(int i = 0; i < multipartFile.size(); i++) {
+                uploadFileService.store(multipartFile.get(i));
             }
         } else {
             // 세션 없음
