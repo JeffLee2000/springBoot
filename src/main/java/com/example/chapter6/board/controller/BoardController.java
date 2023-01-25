@@ -10,16 +10,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/board")
@@ -170,5 +179,41 @@ public class BoardController {
 
         model.addAttribute("data", message);
         return "message/message";
+    }
+
+    @PostMapping("/boardSaveTest")
+    public String boardSaveTest(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+
+        logger.info(multipartFile.getName());
+        logger.info(multipartFile.getContentType());
+        logger.info(multipartFile.getOriginalFilename());
+        logger.info(String.valueOf(multipartFile.getSize()));
+
+        Path path = Paths.get("C:/upload_file/").toAbsolutePath().normalize();
+        Files.createDirectories(path);
+
+        String generateFileName = UUID.randomUUID().toString();
+
+        logger.info("파일 명 - {}", generateFileName);
+
+        // 파일 명에서 . 위치 찾기 >>>> lastIndexOf abc.jpg abc.def.jpg
+        int dot = multipartFile.getOriginalFilename().lastIndexOf(".");
+
+        logger.info("dot - {}", dot);
+
+        String extention="";
+
+        if (-1 != dot && multipartFile.getOriginalFilename().length() - 1 > dot) {
+            extention = multipartFile.getOriginalFilename().substring(dot + 1);
+        }
+
+
+        logger.info("확장명 - {}", extention);
+
+        File file  = new File("C:/upload_file/" + generateFileName + "." + extention);
+
+        multipartFile.transferTo(file);
+
+        return "test";
     }
 }

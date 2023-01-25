@@ -7,23 +7,20 @@
     <script src="/smartEditor/js/HuskyEZCreator.js"></script>
 </head>
 <body>
-<form id="writeForm" class="container" layout:fragment="content" method="post" action="/board/save">
+<form id="writeForm" class="container" layout:fragment="content" method="post" enctype="multipart/form-data" action="/board/boardSaveTest">
     <legend class="visually-hidden">게시물 작성</legend>
-    <!--        <input type="text" class="form-control" id="code" name="code">-->
-    <!--        <input type="text" class="form-control" id="regDate" name="regDate">-->
     <input type="hidden" class="form-control" id="id" name="id" th:value="${boardVO.id}">
     <input type="hidden" class="form-control" id="code" name="code" th:value="${boardVO.code}">
     <div class="mb-3">
         <label for="title" class="form-label">제목</label>
         <input type="text" class="form-control" id="title" name="title" placeholder="제목" th:value="${boardVO.title}">
     </div>
-    <!--        <div class="mb-3">-->
-    <!--            <label for="regId" class="form-label">작성자</label>-->
-    <!--            <input type="text" class="form-control" id="regId" name="regId" placeholder="작성자">-->
-    <!--        </div>-->
     <div class="mb-3">
         <label for="content" class="form-label">내용</label>
         <textarea class="form-control" id="content" name="content" rows="10" placeholder="내용" th:utext="${boardVO.content}"></textarea>
+    </div>
+    <div class="mb-3">
+        <input type="file" name="file" class="form-control" />
     </div>
     <hr>
     <div class="d-flex justify-content-center mb-3">
