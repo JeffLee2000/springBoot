@@ -5,16 +5,19 @@ import com.example.chapter6.model.MemberVO;
 import com.example.chapter6.model.Message;
 import com.example.chapter6.model.SearchHelper;
 import com.example.chapter6.service.BoardService;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.MultipartConfigElement;
@@ -22,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -215,5 +220,22 @@ public class BoardController {
         multipartFile.transferTo(file);
 
         return "test";
+    }
+
+    @GetMapping("/file/download")
+    @ResponseBody
+    public ResponseEntity fileDownload(
+            @RequestParam(value = "name", defaultValue = "") String name
+    ) throws UnsupportedEncodingException, MalformedURLException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + new String(name.getBytes("UTF-8"), "ISO-8859-1") + "\"");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        Path path = Paths.get("C:/upload_file/" + name).toAbsolutePath().normalize();
+        logger.info(String.valueOf(path));
+        Resource resource = new UrlResource(path.toUri());
+
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 }
