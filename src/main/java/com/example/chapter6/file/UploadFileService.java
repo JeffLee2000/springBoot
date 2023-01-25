@@ -30,6 +30,7 @@ public class UploadFileService {
         if (file.isEmpty()) throw new Exception("파일 저장 실패");
 
         String saveFileName = UploadFile.fileSave(rootLocation.toString(), file);
+        log.info("saveFileName - {}", saveFileName);
 
     }
 }
