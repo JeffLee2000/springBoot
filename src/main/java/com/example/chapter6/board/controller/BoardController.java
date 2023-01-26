@@ -1,11 +1,10 @@
 package com.example.chapter6.board.controller;
 
+import com.example.chapter6.Util.MediaUtil;
 import com.example.chapter6.file.FileMapService;
 import com.example.chapter6.file.UploadFileService;
-import com.example.chapter6.model.BoardVO;
-import com.example.chapter6.model.MemberVO;
-import com.example.chapter6.model.Message;
-import com.example.chapter6.model.SearchHelper;
+import com.example.chapter6.model.*;
+import com.example.chapter6.payload.response.ApiResponse;
 import com.example.chapter6.service.BoardService;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -90,8 +89,15 @@ public class BoardController {
         if(id > 0) {
             // 게시물 조회
             Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
-            model.addAttribute("boardVO", boardVO);
+            model.addAttribute("boardVO", boardVO.get());
             model.addAttribute("searchHelper", searchHelper);
+
+            if (boardVO.isPresent()) {
+                List<UploadFileVO> fileList = uploadFileService.selectFileByBoardId(boardVO.get().getId());
+                model.addAttribute("uploadFileVO", fileList);
+            } else {
+                model.addAttribute("uploadFileVO", null);
+            }
         } else {
             Message message = new Message();
             message.setMessage("게시물이 없습니다.");
@@ -113,8 +119,17 @@ public class BoardController {
         if(id > 0) {
             // 게시물 조회
             Optional<BoardVO> boardVO = boardService.selectBoardVOById(id);
-            model.addAttribute("boardVO", boardVO);
+            model.addAttribute("boardVO", boardVO.get());
             model.addAttribute("searchHelper", searchHelper);
+
+            logger.info(boardVO.toString());
+
+            if (boardVO.isPresent()) {
+                List<UploadFileVO> fileList = uploadFileService.selectFileByBoardId(boardVO.get().getId());
+                model.addAttribute("uploadFileVO", fileList);
+            } else {
+                model.addAttribute("uploadFileVO", null);
+            }
         } else {
             Message message = new Message();
             message.setMessage("게시물이 없습니다.");
@@ -133,7 +148,8 @@ public class BoardController {
             @RequestParam("file") List<MultipartFile> multipartFile,
             HttpServletRequest request,
             Model model
-    ) throws Exception {
+            ) throws Exception {
+
         HttpSession session = request.getSession();
         MemberVO sessionResult = (MemberVO) session.getAttribute("memberVO");
 
@@ -154,7 +170,12 @@ public class BoardController {
             }
 
             for(int i = 0; i < multipartFile.size(); i++) {
-                uploadFileService.store(multipartFile.get(i));
+                UploadFileVO uploadFileVO = uploadFileService.store(multipartFile.get(i));
+                logger.info("uploadFileVO - {}", uploadFileVO);
+                FileMapVO fileMapVO = new FileMapVO();
+                fileMapVO.setFileId(uploadFileVO.getId());
+                fileMapVO.setBoardId(boardVO.getId());
+                fileMapService.insertFileMap(fileMapVO);
             }
         } else {
             // 세션 없음
@@ -247,4 +268,45 @@ public class BoardController {
 
         return ResponseEntity.ok().headers(headers).body(resource);
     }
+
+    @GetMapping("/file/{fileId}")
+    @ResponseBody
+    public ResponseEntity showFile(@PathVariable int fileId) {
+        try {
+            UploadFileVO uploadFileVO = uploadFileService.load(fileId);
+
+            if (uploadFileVO == null) return ResponseEntity.badRequest().build();
+
+            String fileName = uploadFileVO.getFileName();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1") + "\"");
+
+            if (MediaUtil.containsMediaType(uploadFileVO.getContentType())) {
+                headers.setContentType(MediaType.valueOf(uploadFileVO.getContentType()));
+            } else {
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            }
+
+            Resource resource = uploadFileService.loadAsResource(uploadFileVO.getFileName());
+
+            return ResponseEntity.ok().headers(headers).body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    @GetMapping("/deleteFile/{fileId}")
+    @ResponseBody
+    public ApiResponse deleteFile(@PathVariable int fileId) {
+        Boolean result = uploadFileService.deleteFileById(fileId);
+        if (result) {
+            return new ApiResponse(true, "삭제 완료");
+        } else {
+            return new ApiResponse(false, "삭제 오류");
+        }
+    }
+
 }

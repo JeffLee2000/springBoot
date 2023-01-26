@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+      layout:decorate="~{layout/layout}" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -27,6 +27,11 @@
     <!--    </section>-->
     <section>
         <p class="h6 mb-5" th:utext="*{content}"></p>
+    </section>
+
+    <section th:each="file : ${uploadFileVO}">
+        <img th:if="${file.contentType.toString().contains('image')}" th:src="@{|/board/file/${file.id}|}" alt="">
+        <a th:unless="${file.contentType.toString().contains('image')}" th:href="@{|/board/file/${file.id}|}" th:text="${file.fileName}"></a>
     </section>
     <hr>
     <div class="d-flex justify-content-between mb-3">
