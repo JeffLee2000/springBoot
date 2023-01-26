@@ -1,5 +1,6 @@
 package com.example.chapter6.ServiceImpl;
 
+import com.example.chapter6.exception.BadRequestException;
 import com.example.chapter6.mapper.MemberMapper;
 import com.example.chapter6.model.MemberVO;
 import com.example.chapter6.service.MemberService;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -28,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean duplicateId(String id) throws Exception {
+    public Boolean duplicateId(String id) {
         Boolean res = memberMapper.duplicateId(id);
         return res ? true : false;
     }
@@ -39,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean duplicateEmail(String email) throws Exception {
+    public Boolean duplicateEmail(String email) {
         Boolean res = memberMapper.duplicateEmail(email);
         return res ? true : false;
     }
@@ -59,10 +61,10 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) throws Exception {
-        MemberVO result = memberMapper.loginProcess(memberVO);
+    public Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) {
+        Optional<MemberVO>  result = memberMapper.loginProcess(memberVO);
 
-        if (result != null) {
+        if (result.isPresent()) {
             // 세션 정보 생성
             HttpSession session = request.getSession();
             session.setAttribute("memberVO", result);
@@ -74,12 +76,24 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * api 로그인 처리
+     * @param memberVO
+     * @return
+     */
+    @Override
+    public Optional<MemberVO> loginProcess(MemberVO memberVO) {
+        Optional<MemberVO>  result = memberMapper.loginProcess(memberVO);
+
+        return result;
+    }
+
+    /**
      * 아이디 찾기
      * @param memberVO
      * @return
      */
     @Override
-    public String findUserId(MemberVO memberVO) throws Exception {
+    public String findUserId(MemberVO memberVO) {
         return memberMapper.findUserId(memberVO);
     }
 
@@ -89,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public String findPassword(MemberVO memberVO) throws Exception {
+    public String findPassword(MemberVO memberVO) {
         return memberMapper.findPassword(memberVO);
     }
 
@@ -98,7 +112,7 @@ public class MemberServiceImpl implements MemberService {
      * @param memberVO
      */
     @Override
-    public void updatePassword(MemberVO memberVO) throws Exception {
+    public void updatePassword(MemberVO memberVO) {
         memberMapper.updatePassword(memberVO);
     }
 

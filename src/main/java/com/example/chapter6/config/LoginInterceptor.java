@@ -1,5 +1,6 @@
 package com.example.chapter6.config;
 
+import com.example.chapter6.jwt.JwtTokenValidator;
 import com.example.chapter6.model.MemberVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,21 +16,41 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
 
+    private JwtTokenValidator jwtTokenValidator;
+
+    public LoginInterceptor(JwtTokenValidator jwtTokenValidator) {
+        this.jwtTokenValidator = jwtTokenValidator;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession();
 
-        MemberVO m = new MemberVO();
-        m.setUserId("test");
-        session.setAttribute("memberVO", m);
+        String token = request.getHeader("Authorization");
+        logger.info("token before -{}", token);
+        token = token.replace("Bearer ", "");
+        logger.info("token after -{}", token);
+        // 토큰 검증 메서드
+        Boolean valid = jwtTokenValidator.validateToken(token);
 
-        MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
-
-        if (memberVO != null) {
+        if(valid) {
             return true;
         } else {
-            response.sendRedirect("/member/login");
             return false;
         }
+
+//        HttpSession session = request.getSession();
+//
+//        MemberVO m = new MemberVO();
+//        m.setUserId("test");
+//        session.setAttribute("memberVO", m);
+//
+//        MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
+//
+//        if (memberVO != null) {
+//            return true;
+//        } else {
+//            response.sendRedirect("/member/login");
+//            return false;
+//        }
     }
 }

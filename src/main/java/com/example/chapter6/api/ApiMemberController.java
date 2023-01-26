@@ -6,8 +6,10 @@ import com.example.chapter6.exception.BadRequestException;
 import com.example.chapter6.exception.InsertFailException;
 import com.example.chapter6.exception.ResourceAlreadyUseException;
 import com.example.chapter6.exception.UserNotFoundException;
+import com.example.chapter6.jwt.AuthService;
 import com.example.chapter6.mapper.BoardMapper;
 import com.example.chapter6.model.MemberVO;
+import com.example.chapter6.payload.request.LoginRequest;
 import com.example.chapter6.payload.response.ApiResponse;
 import com.example.chapter6.service.MemberService;
 import lombok.Value;
@@ -16,9 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/member")
@@ -26,10 +30,45 @@ public class ApiMemberController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiMemberController.class);
 
-    private final MemberService memberService;
+    private MemberService memberService;
+    private AuthService authService;
 
-    public ApiMemberController(MemberService memberService) {
+    public ApiMemberController(MemberService memberService, AuthService authService) {
         this.memberService = memberService;
+        this.authService = authService;
+    }
+
+    /**
+     * 로그인 처리
+     * @param loginRequest
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/login")
+    public ApiResponse loginProcess(@RequestBody @Valid LoginRequest loginRequest) {
+        MemberVO memberVO = new MemberVO();
+        memberVO.setUserId(loginRequest.getUserId());
+        memberVO.setPassword(loginRequest.getPassword());
+
+        Optional<MemberVO> result = memberService.loginProcess(memberVO);
+
+        if (!result.isPresent()) throw new BadRequestException("계정이 없어요");
+
+        String token = authService.generateToken(result.get().getUserId());
+
+        logger.info("토큰으로 반환된 ID - {}", authService.getUserIdFromJWT(token));
+        logger.info("토큰으로 반환된 만료일 - {}", authService.getTokenExpiryFromJWT(token));
+
+        return new ApiResponse(true, token);
+    }
+
+    @GetMapping("/apiTest")
+    public ApiResponse loginProcess(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        token = token.replace("Bearer ", "");
+        logger.info("토큰으로 반환된 ID - {}", authService.getUserIdFromJWT(token));
+        logger.info("토큰으로 반환된 만료일 - {}", authService.getTokenExpiryFromJWT(token));
+        return new ApiResponse(true, "완료");
     }
 
     /**

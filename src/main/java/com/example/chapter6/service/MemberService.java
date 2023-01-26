@@ -5,22 +5,25 @@ import org.springframework.validation.Errors;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Optional;
 
 public interface MemberService {
 
-    Boolean duplicateId(String id) throws Exception;
+    Boolean duplicateId(String id);
 
-    Boolean duplicateEmail(String email) throws Exception;
+    Boolean duplicateEmail(String email);
 
     void insertMember(MemberVO memberVO) throws Exception;
 
-    Boolean loginProcess(MemberVO memberVO, HttpServletRequest request) throws Exception;
+    Boolean loginProcess(MemberVO memberVO, HttpServletRequest request);
 
-    String findUserId(MemberVO memberVO) throws Exception;
+    Optional<MemberVO> loginProcess(MemberVO memberVO);
 
-    String findPassword(MemberVO memberVO) throws Exception;
+    String findUserId(MemberVO memberVO);
 
-    void updatePassword(MemberVO memberVO) throws Exception;
+    String findPassword(MemberVO memberVO);
+
+    void updatePassword(MemberVO memberVO);
 
     Map<String, String> formValidation(Errors errors);
 
