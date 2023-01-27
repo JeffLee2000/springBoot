@@ -1,6 +1,7 @@
 package com.example.chapter6.service;
 
 import com.example.chapter6.model.MemberVO;
+import com.example.chapter6.payload.response.JwtAuthenticationResponse;
 import org.springframework.validation.Errors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ public interface MemberService {
 
     Boolean loginProcess(MemberVO memberVO, HttpServletRequest request);
 
-    Optional<MemberVO> loginProcess(MemberVO memberVO);
+    JwtAuthenticationResponse loginProcess(MemberVO memberVO);
 
     String findUserId(MemberVO memberVO);
 

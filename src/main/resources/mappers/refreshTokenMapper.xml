@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.chapter6.mapper.RefreshTokenMapper">
+
+    <!-- 토큰으로 사용자 정보 조회 -->
+
+    <!-- member id 존재 여부 -->
+    <select id="existMemberId" parameterType="int" resultType="boolean">
+        SELECT
+            IF(COUNT(*) >= 1, 1, 0)
+        FROM refresh_token
+        WHERE member_id = #{id}
+    </select>
+
+    <!-- 토큰을 최초로 생성 -->
+    <insert id="insertRefreshToken" parameterType="RefreshTokenVO">
+        INSERT INTO refresh_token (
+            member_id,
+            refresh_token,
+            expiry_date,
+            reg_date
+        ) VALUES (
+            #{memberId},
+            #{refreshToken},
+            #{expiryDate},
+            NOW()
+        )
+    </insert>
+
+    <!-- 토큰 갱신 및 카운트 증가 -->
+    <update id="updateRefreshToken" parameterType="RefreshTokenVO">
+        UPDATE refresh_token SET
+            refresh_token = #{refreshToken},
+            refresh_count = refresh_count + 1,
+            expiry_date = #{expiryDate},
+            mod_date = NOW()
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 토큰 삭제 -->
+
+</mapper>

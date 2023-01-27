@@ -31,7 +31,7 @@ dependencies {
 	implementation 'org.webjars:bootstrap:5.1.2'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
-	//implementation 'net.jodah:expiraingmap:0.5.10'
+	implementation 'net.jodah:expiringmap:0.5.10'
 }
 
 test {

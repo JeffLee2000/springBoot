@@ -1,8 +1,13 @@
 package com.example.chapter6.ServiceImpl;
 
 import com.example.chapter6.exception.BadRequestException;
+import com.example.chapter6.jwt.AuthService;
+import com.example.chapter6.jwt.JwtTokenValidator;
+import com.example.chapter6.jwt.RefreshTokenService;
 import com.example.chapter6.mapper.MemberMapper;
 import com.example.chapter6.model.MemberVO;
+import com.example.chapter6.model.RefreshTokenVO;
+import com.example.chapter6.payload.response.JwtAuthenticationResponse;
 import com.example.chapter6.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +24,13 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private MemberMapper memberMapper;
+    private AuthService authService;
+    private RefreshTokenService refreshTokenService;
 
-    public MemberServiceImpl(MemberMapper memberMapper) {
+    public MemberServiceImpl(MemberMapper memberMapper, AuthService authService, RefreshTokenService refreshTokenService) {
         this.memberMapper = memberMapper;
+        this.authService = authService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     /**
@@ -81,10 +90,44 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Optional<MemberVO> loginProcess(MemberVO memberVO) {
+    public JwtAuthenticationResponse loginProcess(MemberVO memberVO) {
         Optional<MemberVO>  result = memberMapper.loginProcess(memberVO);
 
-        return result;
+        if (result.isPresent()) {
+            /**
+             * 1. fresh_token 테이블에 member 테이블의 id 값이 존재하면 토큰을 갱신한다.
+             * 2. refresh_toen 테이블에 member 테이블의 id값이 존재하지 않으면 토큰을 생성 후 insert 한다.
+             * 3. accessToken을 발급한다.
+             * 4. refreshToken 발급한 정보와 accessToken 정보를 JSON으로 리턴.
+             */
+            Boolean existMemberId = refreshTokenService.existMemberId(result.get().getId());
+
+            if (existMemberId) {
+                String accessToken = authService.generateToken(result.get().getUserId());
+                RefreshTokenVO refreshTokenVO = refreshTokenService.updateRefreshToken(result.get().getId());
+                JwtAuthenticationResponse response = new JwtAuthenticationResponse();
+                response.setAccessToken(accessToken);
+                response.setRefreshToken(refreshTokenVO.getRefreshToken());
+                long instant = refreshTokenVO.getExpiryDate().getEpochSecond();
+                response.setExpiryDuration(instant);
+
+                return response;
+            } else {
+                String accessToken = authService.generateToken(result.get().getUserId());
+                RefreshTokenVO refreshTokenVO = refreshTokenService.insertRefreshToken(result.get().getId());
+                JwtAuthenticationResponse response = new JwtAuthenticationResponse();
+                response.setAccessToken(accessToken);
+                response.setRefreshToken(refreshTokenVO.getRefreshToken());
+                long instant = refreshTokenVO.getExpiryDate().getEpochSecond();
+                response.setExpiryDuration(instant);
+
+                return response;
+            }
+
+        } else {
+            throw new BadRequestException("사용자 정보가 없습니다.");
+        }
+
     }
 
     /**

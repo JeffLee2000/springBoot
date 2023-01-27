@@ -11,10 +11,13 @@ import com.example.chapter6.mapper.BoardMapper;
 import com.example.chapter6.model.MemberVO;
 import com.example.chapter6.payload.request.LoginRequest;
 import com.example.chapter6.payload.response.ApiResponse;
+import com.example.chapter6.payload.response.JwtAuthenticationResponse;
 import com.example.chapter6.service.MemberService;
 import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,28 +41,33 @@ public class ApiMemberController {
         this.authService = authService;
     }
 
+    @GetMapping("/logout")
+    public ApiResponse logout(HttpServletRequest request) {
+
+        String accessToken = request.getHeader("Authorization");
+        accessToken = accessToken.replace("Bearer", "");
+        // 토큰 검증...
+        String res = authService.getUserIdFromJWT(accessToken);
+        //test id
+
+
+        return new ApiResponse(true, "완료");
+    }
+
+
     /**
      * 로그인 처리
      * @param loginRequest
      * @return
-     * @throws Exception
      */
     @PostMapping("/login")
-    public ApiResponse loginProcess(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity loginProcess(@RequestBody @Valid LoginRequest loginRequest) {
         MemberVO memberVO = new MemberVO();
         memberVO.setUserId(loginRequest.getUserId());
         memberVO.setPassword(loginRequest.getPassword());
 
-        Optional<MemberVO> result = memberService.loginProcess(memberVO);
-
-        if (!result.isPresent()) throw new BadRequestException("계정이 없어요");
-
-        String token = authService.generateToken(result.get().getUserId());
-
-        logger.info("토큰으로 반환된 ID - {}", authService.getUserIdFromJWT(token));
-        logger.info("토큰으로 반환된 만료일 - {}", authService.getTokenExpiryFromJWT(token));
-
-        return new ApiResponse(true, token);
+        JwtAuthenticationResponse result = memberService.loginProcess(memberVO);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/apiTest")
