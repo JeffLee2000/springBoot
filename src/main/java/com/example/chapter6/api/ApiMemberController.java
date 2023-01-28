@@ -2,6 +2,7 @@ package com.example.chapter6.api;
 
 import com.example.chapter6.Util.ExceptionMessage;
 import com.example.chapter6.Util.Util;
+import com.example.chapter6.event.OnLogoutSuccessEvent;
 import com.example.chapter6.exception.BadRequestException;
 import com.example.chapter6.exception.InsertFailException;
 import com.example.chapter6.exception.ResourceAlreadyUseException;
@@ -16,6 +17,7 @@ import com.example.chapter6.service.MemberService;
 import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -35,10 +37,12 @@ public class ApiMemberController {
 
     private MemberService memberService;
     private AuthService authService;
+    private ApplicationEventPublisher applicationEventPublisher;
 
-    public ApiMemberController(MemberService memberService, AuthService authService) {
+    public ApiMemberController(MemberService memberService, AuthService authService, ApplicationEventPublisher applicationEventPublisher) {
         this.memberService = memberService;
         this.authService = authService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @GetMapping("/logout")
@@ -49,7 +53,8 @@ public class ApiMemberController {
         // 토큰 검증...
         String res = authService.getUserIdFromJWT(accessToken);
         //test id
-
+        OnLogoutSuccessEvent event = new OnLogoutSuccessEvent(res, accessToken);
+        applicationEventPublisher.publishEvent(event);
 
         return new ApiResponse(true, "완료");
     }
